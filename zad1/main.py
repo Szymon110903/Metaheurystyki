@@ -1,8 +1,8 @@
 import time
 import os
-import data.dataReader as dr # Upewnij się, że masz plik data/dataReader.py
+import data.dataReader as dr
+import ant_Algorythm as aco
 
-# === KOD DOSTARCZONY PRZEZ UŻYTKOWNIKA ===
 # (Funkcje pomocnicze menu)
 
 def wyczysc_ekran():
@@ -12,11 +12,9 @@ def wyczysc_ekran():
 def wyswietl_aktualne_parametry(parametry):
     """Wyświetla aktualne wartości wszystkich ustawień."""
     print("--- AKTUALNE USTAWIENIA ALGORYTMU ---")
+
     
-    # Dodana obsługa, gdyby plik był 'None' (chociaż teraz ma wartość domyślną)
-    plik_danych_wysw = parametry['plik_danych'] if parametry['plik_danych'] else "[NIE WYBRANO]"
-    
-    print(f"  Plik danych (wczytywanie): {plik_danych_wysw}")
+    print(f"  Plik danych (wczytywanie): {parametry['plik_danych']}")
     print(f"  Ilość mrówek:              {parametry['ilosc_mrowek']}")
     print(f"  Ilość iteracji:            {parametry['ilosc_iteracji']}")
     print(f"  Waga feromonu (alpha):     {parametry['alpha']:.2f}")
@@ -33,10 +31,8 @@ def menu_zmiany_danych(aktualne_parametry):
         wyczysc_ekran()
         print("--- ZMIANA PARAMETRÓW ALGORYTMU ---")
         
-        plik_danych_wysw = nowe_parametry['plik_danych'] if nowe_parametry['plik_danych'] else "[NIE WYBRANO]"
-        
         print("\nKtóry parametr chcesz zmienić?")
-        print(f"  1. Plik wczytywania danych ({plik_danych_wysw})")
+        print(f"  1. Plik wczytywania danych ({nowe_parametry['plik_danych']})")
         print(f"  2. Ilość mrówek            ({nowe_parametry['ilosc_mrowek']})")
         print(f"  3. Ilość iteracji          ({nowe_parametry['ilosc_iteracji']})")
         print(f"  4. Waga feromonu (alpha)   ({nowe_parametry['alpha']:.2f})")
@@ -82,7 +78,6 @@ def menu_zmiany_danych(aktualne_parametry):
             
             time.sleep(1.5)
 
-        # --- OPCJE 2-7 (Bez zmian) ---
         elif wybor_param == '2':
             stara_wartosc = nowe_parametry['ilosc_mrowek']
             print(f"Aktualna wartość: {stara_wartosc}")
@@ -203,7 +198,6 @@ def menu_zmiany_danych(aktualne_parametry):
                     print("[BŁĄD] To nie jest poprawna liczba (np. 100 lub 50.5).")
             time.sleep(1)
 
-        # --- 8. Powrót ---
         elif wybor_param == '8':
             print("Zapisywanie zmian i powrót do menu głównego...")
             return nowe_parametry
@@ -213,37 +207,17 @@ def menu_zmiany_danych(aktualne_parametry):
             time.sleep(1)
 
 def uruchom_program(parametry):
-    """Ulepszona funkcja uruchamiania z walidacją i lepszym formatowaniem."""
-    
-    # Walidacja, czy plik jest w ogóle wybrany
-    if not parametry['plik_danych']:
-        print("\n[BŁĄD KRYTYCZNY] Nie można uruchomić programu!")
-        print("Nie wybrano pliku z danymi.")
-        print("Wybierz plik w opcjach (1. Zmień ustawienia).")
-        return # Przerwij funkcję
-        
-    print(f"Wczytywanie danych z: {parametry['plik_danych']}...")
-    
-    # Wywołanie funkcji z modułu dataReader
     data = dr.read_data_from_file(parametry['plik_danych'])
-    
-    if not data:
-         print("\n[BŁĄD] Nie udało się wczytać danych lub plik jest pusty.")
-    else:
-        print(f"\nPomyślnie wczytano {len(data)} rekordów.")
-        print("--- PODGLĄD DANYCH (pierwsze 5 rekordów) ---")
-        # Pokaż tylko 5 pierwszych linii, żeby nie zaśmiecać ekranu
-        for i, linia in enumerate(data[:5]): 
-            print(f"  {linia}")
-        if len(data) > 5:
-            print(f"  (...i {len(data) - 5} więcej rekordów)")
-            
-    # Tutaj w przyszłości uruchomisz główną logikę ACO
-    # np. aco_solver = ACO(parametry, data)
-    #    wynik = aco_solver.run()
-    #    print(f"Znaleziono najlepszą trasę: {wynik}")
-    
-    print("\n(Symulacja algorytmu zakończona)")
+    aco.AntColony(
+        num_ants=parametry['ilosc_mrowek'],
+        num_iterations=parametry['ilosc_iteracji'],
+        Q=parametry['Q'],
+        A=parametry['alpha'],
+        B=parametry['beta'],
+        rho=parametry['rho'],
+        data=data
+    ).run()
+
 
 
 def main():
