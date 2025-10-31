@@ -222,7 +222,8 @@ def uruchom_program(parametry):
 
 def main():
     parametry_aco = {
-        'plik_danych': 'A-n32-k5.txt', 
+        # 'plik_danych': 'A-n32-k5.txt',
+        'plik_danych': 'przyklad.txt',
         'ilosc_mrowek': 50,
         'ilosc_iteracji': 100,
         'alpha': 1.0,
@@ -251,10 +252,7 @@ def main():
             parametry_aco = menu_zmiany_danych(parametry_aco)
             
         elif wybor_glowny == '2':
-            # === POPRAWKA ===
-            # Najpierw czyścimy menu
             wyczysc_ekran() 
-            print("--- URUCHAMIANIE PROGRAMU ---")
             
             uruchom_program(parametry_aco)
             
