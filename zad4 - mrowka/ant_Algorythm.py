@@ -66,7 +66,7 @@ class AntColony:
                 probabilities.append((attraction, prob))
                 total += prob
 
-        # obsługa przypadku 
+        # obsługa przypadku gdy suma prawdopodobieństw wynosi 0
         if total == 0:
             return random.choice([j for j in range(self.num_attractions) if j not in visited])
 
@@ -86,17 +86,19 @@ class AntColony:
         pass
 
     def run(self):
-        print(self.distance_matrix(self.coordinates))
-        print(self.heuristic_matrix(self.distance_matrix(self.coordinates)))
-
+        # print(self.distance_matrix(self.coordinates))
+        # print(self.heuristic_matrix(self.distance_matrix(self.coordinates)))
+        for coordx, coordy in self.coordinates:
+            print(coordx, coordy)
         for iter in range(self.num_iterations):
             all_paths = []
             all_distances = []
             for ant in range(self.num_ants):
                 visited = []
                 distance_traveled = 0
-                # losowa pierwsza pozycja mrówki
-                current_attraction = random.randint(0, self.num_attractions - 1)
+                # pierwsza pozycja mrówki to pierwsza atrakcja
+                current_attraction = 0
+                visited.append(current_attraction)
                 while len(visited) < self.num_attractions:
                     next_attraction = self.select_next_attraction(current_attraction, visited)
                     visited.append(next_attraction)
