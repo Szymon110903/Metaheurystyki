@@ -30,11 +30,8 @@ class SimulatedAnnealing:
         x_best = x_current
         f_best = f_current
         
-        # --- Globalny licznik iteracji ---
         global_iteration_count = 0
-        # Zapisujemy iterację 0 dla punktu startowego
         self.best_solution_iteration = 0
-        # Zapisujemy też punkt startowy (indeks korekcji 0)
         self.best_solutions_history.append((self.licznik_korekcji, x_best, f_best)) 
         
         # Warunek stopu - np. minimalna temperatura

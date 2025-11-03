@@ -3,10 +3,10 @@ from functions import funkcja_przykład3, funkcja_przykład4
 from plots import *
 
 parametry_algorytmu = {
-    "T0": 1000.0,  # Temperatura początkowa
-    "A": 0.9,      # Współczynnik chłodzenia
-    "M": 1000,     # Liczba iteracji w T
-    "k": 1.0,      # Współczynnik 'k'
+    "T0": 1000,  # Temperatura początkowa
+    "A": 0.7,      # Współczynnik chłodzenia
+    "M": 1200,     # Liczba iteracji w T
+    "k": 0.1,      # Współczynnik 'k'
 }
 
 
