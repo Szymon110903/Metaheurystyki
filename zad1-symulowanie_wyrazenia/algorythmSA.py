@@ -9,6 +9,7 @@ class SimulatedAnnealing:
         self.A = A # współczynnik/sposób chłodzenia
         self.M = M # liczba iteracji
         self.k = k # współczynnik k, stała Boltzmanna
+
         self.licznik_korekcji = 0
         self.start_time = None
         self.execution_time = 0
