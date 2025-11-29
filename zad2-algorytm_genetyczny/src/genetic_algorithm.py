@@ -60,8 +60,6 @@ class GeneticAlgorithm:
         self.values = values # ceny przedmiotow [c1, c2, c3, ...] (zl)
         self.capacity = capacity # udzwig plecaka = 6 404 180 kg
 
-
-
         # parametry GA
         self.N = population_size
         self.T = generations
@@ -98,6 +96,14 @@ class GeneticAlgorithm:
                 subject.append(random.randint(0, 1))
 
             self.population.append(subject)
+
+    def calculate_weight(self, subject):
+        total_weight = 0
+        for i, gene in enumerate(subject):
+            if gene == 1:
+                total_weight += self.weights[i]
+
+        return total_weight
 
     '''metoda wyliczajca fitnes dla podanego osobnika (chromosomu)'''
     def fitness_function(self, subject):
@@ -309,6 +315,7 @@ class GeneticAlgorithm:
 
         return {
             'best_value': self.fitness[self.best_index],
+            'best_weight': self.calculate_weight(self.population[self.best_index]),
             'best_individual': self.population[self.best_index],
             'worst_individual': self.population[self.worst_index],
             'worst_value': self.fitness[self.worst_index],

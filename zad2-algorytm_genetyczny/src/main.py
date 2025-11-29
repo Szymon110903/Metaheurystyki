@@ -2,7 +2,7 @@ import pandas as pd
 from genetic_algorithm import GeneticAlgorithm
 
 # ----- import danych -----
-df = pd.read_csv(filepath_or_buffer='problem_plecakowy_dane_tabulatory.csv', sep='\t')
+df = pd.read_csv(filepath_or_buffer='./data/problem_plecakowy_dane_tabulatory.csv', sep='\t')
 
 # usuniecie spacji z liczb i konwersja na int
 df["Waga (kg)"] = df["Waga (kg)"].str.replace(" ", "").astype(int)
@@ -43,6 +43,7 @@ ga = GeneticAlgorithm(
 
 result = ga.run()
 
-print("Najlepszy wynik: ", result["best_value"])
+print("Najlepszy wynik (zł): ", result["best_value"])
+print("Osiągnięta waga (kg) rozwiazania: ", result["best_weight"])
 print("Najlepszy osobnik: ", result["best_individual"])
 print("Czas wykonania: ", result["execution_time"], "s")
