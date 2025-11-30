@@ -1,8 +1,12 @@
 import pandas as pd
 from genetic_algorithm import GeneticAlgorithm
+import os
+import matplotlib.pyplot as plt
 
 # ----- import danych -----
-df = pd.read_csv(filepath_or_buffer='./data/problem_plecakowy_dane_tabulatory.csv', sep='\t')
+current_dir = os.path.dirname(os.path.abspath(__file__))
+data_path = os.path.join(current_dir, 'data', 'problem_plecakowy_dane_tabulatory.csv')
+df = pd.read_csv(filepath_or_buffer=data_path, sep='\t')
 
 # usuniecie spacji z liczb i konwersja na int
 df["Waga (kg)"] = df["Waga (kg)"].str.replace(" ", "").astype(int)
@@ -23,8 +27,8 @@ parametry_algorytmu = {
     "Pc": 0.8,
     "Pm": 0.05,
     "metoda_selekcji": 'roulette', # 'roulette' | 'tournament' | 'ranking'
-    "metoda_krzyżowania": 'two_point', # 'one_point' | 'two_point' | 'uniform'
-    "metoda_mutacji": 'bit_flip' # {na ten moment nie ma znaczenia, bo i tak jest tylko jedna domyslna metoda mutacji}
+    "metoda_krzyżowania": 'uniform', # 'one_point' | 'two_point' | 'uniform'
+    "metoda_mutacji": 'bit_flip'
 }
 
 
@@ -47,3 +51,21 @@ print("Najlepszy wynik (zł): ", result["best_value"])
 print("Osiągnięta waga (kg) rozwiazania: ", result["best_weight"])
 print("Najlepszy osobnik: ", result["best_individual"])
 print("Czas wykonania: ", result["execution_time"], "s")
+print("Generowanie wykresów...")
+
+best_history = result["best_history"]
+avg_history = result["avg_solutions_history"]
+worst_history = result["worst_history"]
+iterations = range(1, len(best_history) + 1)
+
+plt.figure(figsize=(10, 6))
+plt.plot(iterations, best_history, label='Najlepszy wynik (osobnik najlepszy)', color='green')
+plt.plot(iterations, avg_history, label='Średni wynik dla populacji', color='blue')
+
+
+plt.title('Zbieżność Algorytmu Genetycznego')
+plt.xlabel('Iteracja')
+plt.ylabel('Wartość funkcji przystosowania (Fitness)')
+plt.legend()
+plt.grid(True)
+plt.show()
