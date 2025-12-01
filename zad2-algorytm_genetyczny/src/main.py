@@ -19,7 +19,7 @@ parametry_algorytmu = {
     "lista_wartosci": values,
     "pojemnosc_plecaka": 6404180,
     "wielkosc_populacji": 100,
-    "ilosc_iteracji": 500,
+    "ilosc_iteracji": 1000,
     "Pc": 0.8,
     "Pm": 0.05,
     "metoda_selekcji": 'roulette', # 'roulette' | 'tournament' | 'ranking'
@@ -45,5 +45,6 @@ result = ga.run()
 
 print("Najlepszy wynik (zł): ", result["best_value"])
 print("Osiągnięta waga (kg) rozwiazania: ", result["best_weight"])
+print("Różnica wartości wag: capacity - best_weight = ", (6404180 - result["best_weight"]))
 print("Najlepszy osobnik: ", result["best_individual"])
 print("Czas wykonania: ", result["execution_time"], "s")
