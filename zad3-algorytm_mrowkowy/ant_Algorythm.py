@@ -6,6 +6,7 @@ import time
 class AntColony:
     def __init__(self, num_ants, num_iterations, Q, A, B, rho, data):
         self.num_ants = num_ants
+        self.p_random = 0.0 # prawdopodobienstwo wyboru losowej atrakcji. do przetestowania kilka poziomow {0.0, 0.01, 0.05, 0.1}
         self.num_iterations = num_iterations
         self.Q = Q        #stała ilośc feromonu pozostawiana przez mrówkę
         self.A = A        #waga śladu feromonu
@@ -57,6 +58,9 @@ class AntColony:
     # w mianowniku suma tych wartości dla wszystkich nieodwiedzonych atrakcji
     
     def select_next_attraction(self, current_attraction, visited):
+        unvisited = [j for j in range(self.num_attractions) if j not in visited]
+        if random.random() < self.p_random:
+            return random.choice(unvisited)
 
         probabilities = [] 
         total = 0.0        # suma prawdopodobieństw - mianownik
@@ -79,11 +83,21 @@ class AntColony:
 
     """ Parowanie feromonu """
     def evaporate_pheromone(self):
-        pass
+        for i in range(self.num_attractions):
+            for j in range(self.num_attractions):
+                if i != j:
+                    self.pheromone_matrix[i][j] *= (1.0 - self.rho)
 
     """ Aktualizacja feromonu """
-    def update_pheromone(self):
-        pass
+    def update_pheromone(self, all_paths, all_distances):
+        for path, length in zip(all_paths, all_distances):
+            if length <= 0:
+                continue
+            deposit = self.Q / length
+            for k in range(len(path) - 1):
+                i, j = path[k], path[k + 1]
+                self.pheromone_matrix[i][j] += deposit
+                self.pheromone_matrix[j][i] += deposit
 
     def run(self):
         # print(self.distance_matrix(self.coordinates))
@@ -110,5 +124,5 @@ class AntColony:
                 all_distances.append(distance_traveled)
 
             # aktualizacja feromonu po przejściu wszystkich mrówek - raz na iteracje
-            # self.evaporate_pheromone()
-            # self.update_pheromone()
+            self.evaporate_pheromone()
+            self.update_pheromone(all_paths, all_distances)
