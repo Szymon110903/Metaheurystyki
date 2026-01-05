@@ -1,7 +1,10 @@
 import os
 
 def read_data_from_file(filename):
-    file_path = os.path.join("data", filename)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    file_path = os.path.join(current_dir, filename)
+    
     data = []
     try:
         with open(file_path, 'r') as file:
@@ -9,15 +12,19 @@ def read_data_from_file(filename):
                 if line.strip() and not line.startswith('#'):
                     values = line.strip().split()
                     if len(values) == 3:
-                        id_num = int(values[0])
-                        x = float(values[1])
-                        y = float(values[2])
-                        data.append((id_num, x, y))
-                        # print(f"Read data - ID: {id_num}, X: {x}, Y: {y}")
+                        try:
+                            id_num = int(values[0])
+                            x = float(values[1])
+                            y = float(values[2])
+                            data.append((id_num, x, y))
+                        except ValueError:
+                            continue 
+                            
     except FileNotFoundError:
-        print(f"Error: File {file_path} not found")
+        print(f"[BŁĄD] Nie znaleziono pliku: {file_path}")
+        return []
     except Exception as e:
-        print(f"Error reading file: {str(e)}")
+        print(f"[BŁĄD] Problem z odczytem pliku: {str(e)}")
+        return []
     
     return data
-
