@@ -5,26 +5,28 @@ import time
 
 class Ant:
     def __init__(self, start_node, num_nodes):
-        self.visited = [start_node]
-        self.current_node = start_node
-        self.total_distance = 0.0
-        self.num_nodes = num_nodes
+        self.visited = [start_node] # lista odwiedzonych miast
+        self.current_node = start_node # aktualne miasto
+        self.total_distance = 0.0 # całkowita odległość przejechana przez mrówkę
+        self.num_nodes = num_nodes # liczba miast
 
     def move(self, distance_matrix, pheromone_matrix, alpha, beta, p_random):
-        # Nieodwiedzone miasta
+        # Nieodwiedzone miasta - przy każdym ruchu uwzględniane są tylko te miejsca, gdzie 
+        # mórowka jeszcze nie była
         unvisited = [node for node in range(self.num_nodes) if node not in self.visited]
         
         if not unvisited:
             return
-
+        # wybór lowsowego miasta z prawdopodobieństwem p_random
         if random.random() < p_random:
-            next_node = random.choice(unvisited) # ruch losowy
+            next_node = random.choice(unvisited) 
         else:
-            # Wyliczanie prawdopodobieństw
+            # Wyliczanie prawdopodobieństw przejścia do nieodwiedzonych miast 
+            # wzorem feromony^alfa  * (1/dystans)^beta - gdzie alfa i beta to wagi feromonów i heurystyki
             probabilities = []
             denominator = 0.0
             
-            # liczniki dla każdego nieodzwiedzonego miasta
+            # liczniki dla każdego nieodzwiedzonego miasta + zliczanie mianownika
             numerators = []
             for node in unvisited:
                 dist = distance_matrix[self.current_node][node]
@@ -42,14 +44,14 @@ class Ant:
                 probabilities = [1.0 / len(unvisited)] * len(unvisited)
             else:
                 probabilities = [num / denominator for num in numerators]
-
+            # Wybór następnego miasta na podstawie obliczonych prawdopodobieństw
             next_node = np.random.choice(unvisited, p=probabilities)
 
         dist_to_next = distance_matrix[self.current_node][next_node]
         self.total_distance += dist_to_next
         self.visited.append(next_node)
         self.current_node = next_node
-
+    # Powrót do miasta startowego po odwiedzeniu wszystkich miast - zrobienie jednej iteracji
     def return_to_start(self, distance_matrix):
         start_node = self.visited[0]
         dist = distance_matrix[self.current_node][start_node]
@@ -59,8 +61,8 @@ class Ant:
 class AntColony:
     def __init__(self, num_ants, num_iterations, Q, A, B, rho, p_random, data):
         self.num_ants = num_ants
-        self.p_random = 0.0 # prawdopodobienstwo wyboru losowej atrakcji. do przetestowania kilka poziomow {0.0, 0.01, 0.05, 0.1}
-        self.num_iterations = num_iterations
+        self.p_random = 0.0 # prawdopodobienstwo wyboru losowej atrakcji
+        self.num_iterations = num_iterations  # Liczba iteracji
         self.Q = Q          # Stała feromonowa
         self.alpha = A      # Waga feromonu
         self.beta = B       # Waga heurystyki
@@ -118,10 +120,10 @@ class AntColony:
             self.best_route_history.append(self.best_distance)
 
             self._update_pheromones(ants)
-
+            # postęp co 10 iteracji
             if verbose and (iteration + 1) % 10 == 0:
                 print(f"Iteracja {iteration + 1}/{self.num_iterations}: Najlepszy koszt = {self.best_distance:.2f}")
-
+        # czas wykonania
         execution_time = time.time() - start_time
         
         if verbose:
@@ -134,9 +136,14 @@ class AntColony:
     
     # Aktualizacja poziomów feromonów
     def _update_pheromones(self, ants):
+        # Parowanie feromonów:
         # f_ij = (1 - rho) * f_ij
         self.pheromone_matrix *= (1 - self.rho)
 
+        # Dodawanie nowych feromonów wzdłuż tras mrówek
+        # f_ij += Q / L_k
+        # ilosc fromonow dodawanych na kazdym odcinku trasy jest odwrotnie proporcjonalna do dlugosci trasy
+        # czym krotsza trasa tym wiecej feromonow
         for ant in ants:
             contribution = self.Q / ant.total_distance
             path = ant.visited
