@@ -200,8 +200,8 @@ def main():
     parametry_aco = {
         'plik_danych': 'A-n32-k5.txt', 
         'ilosc_mrowek': 50,
-        'ilosc_iteracji': 100,
-        'alpha': 1.0,
+        'ilosc_iteracji': 50,
+        'alpha': 5.0,
         'beta': 5.0,
         'rho': 0.9,
         'Q': 100.0,
