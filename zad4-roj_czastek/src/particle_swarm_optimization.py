@@ -1,90 +1,154 @@
 import random
 import time
+import matplotlib.pyplot as plt
+
+'''
+format bounds
+bounds = [
+    (min_x1, max_x1),
+    (min_x2, max_x2),
+    ...
+    (min_xN, max_xN)
+]
+'''
+
 
 class Particle:
-    def __init__(self, position_x, position_y, fitness):
-        self.x = position_x
-        self.y = position_y
-        self.vx = 0.0
-        self.vy = 0.0
+    def __init__(self, position, fitness, mm):
+        self.position = position.copy() # kopia przekazanej listy pozycji
+        dim = len(position)
+        #TODO: zastanowic sie nad wybraniem losowych poczatkowych predkosci np z zakresu [-1,1]
+        self.velocity = [0.0] * dim
 
-        self.fitness = fitness
+        self.fitness = lambda X: mm * fitness(X)
 
-        self.best_position = (self.x, self.y)
-        self.best_value = self.fitness(self.x, self.y)
+        self.best_position = self.position.copy()
+        self.best_value = self.fitness(self.position)
 
     def evaluate(self):
-        value = self.fitness(self.x, self.y)
+        value = self.fitness(self.position)
         if value < self.best_value:
             self.best_value = value
-            self.best_position = (self.x, self.y)
+            self.best_position = self.position.copy()
         return value
 
     def move(self, gbest_position, w, c1, c2, v_max, bounds):
-        # TODO: sprawdzic czy tutaj nie powinno sie losowac r1 i r2 osobno dla vx i vy (tak zeby byly 4 losowania a nie 2)
-        r1 = random.random()
-        r2 = random.random()
+        dim = len(self.position)
 
-        px, py = self.best_position
-        gx, gy = gbest_position
+        for i in range(dim):
+            r1 = random.random()
+            r2 = random.random()
 
-        self.vx = w * self.vx + c1 * r1 * (px - self.x) + c2 * r2 * (gx - self.x)
-        self.vy = w * self.vy + c1 * r1 * (py - self.y) + c2 * r2 * (gy - self.y)
+            # aktualizacja predkosci
+            self.velocity[i] = (
+                w * self.velocity[i]
+                + c1 * r1 * (self.best_position[i] - self.position[i])
+                + c2 * r2 * (gbest_position[i] - self.position[i])
+            )
 
-        if self.vx > v_max: self.vx = v_max
-        if self.vx < -v_max: self.vx = -v_max
-        if self.vy > v_max: self.vy = v_max
-        if self.vy < -v_max: self.vy = -v_max
+            # przyciecie predkosci do granic
+            if self.velocity[i] > v_max:
+                self.velocity[i] = v_max
+            elif self.velocity[i] < -v_max:
+                self.velocity[i] = -v_max
 
-        self.x += self.vx
-        self.y += self.vy
+            # aktualizacja pozycji
+            self.position[i] += self.velocity[i]
 
-        (xmin, xmax), (ymin, ymax) = bounds
-
-        if self.x < xmin: self.x = xmin
-        if self.x > xmax: self.x = xmax
-        if self.y < ymin: self.y = ymin
-        if self.y > ymax: self.y = ymax
+            # bounds dla i-tego wymiaru
+            min_i, max_i = bounds[i]
+            if self.position[i] < min_i:
+                self.position[i] = min_i
+            elif self.position[i] > max_i:
+                self.position[i] = max_i
 
 
 class ParticleSwarmOptimization:
-    def __init__(self, fitness, bounds, n_particles=30, w=0.7, c1=1.5, c2=1.5, v_max=1.0, n_iterations=30):
+    def __init__(self, fitness, bounds, n_particles=30, n_iterations=30, w=0.7, c1=1.5, c2=1.5, v_max=1.0, minimization=True):
         self.fitness = fitness
         self.bounds = bounds
 
         self.n_particles = n_particles
+        self.n_iterations = n_iterations
         self.w = w
         self.c1 = c1
         self.c2 = c2
         self.v_max = v_max
-        self.n_iterations = n_iterations
 
-        (xmin, xmax), (ymin, ymax) = bounds
+        self.mm = None
+        if minimization:
+            self.mm = 1
+        else:
+            self.mm = -1
+
         self.swarm = []
+        dim = len(bounds)
 
         for _ in range(self.n_particles):
-            x = random.uniform(xmin, xmax)
-            y = random.uniform(ymin, ymax)
-            p = Particle(x, y, self.fitness)
+            position = []
+            for i in range(dim):
+                min_i, max_i = bounds[i]
+                position.append(random.uniform(min_i, max_i))
 
+            p = Particle(position, self.fitness, self.mm)
             self.swarm.append(p)
 
         best = self.swarm[0]
-        for p in self.swarm:
+        for p in self.swarm[1:]:
             if p.best_value < best.best_value:
                 best = p
 
-        self.gbest_position = best.best_position
+        self.gbest_position = best.best_position.copy()
         self.gbest_value = best.best_value
 
-    def run(self):
-        for _ in range(self.n_iterations):
-            for p in self.swarm:
-                p.move(self.gbest_position, self.w, self.c1, self.c2, self.v_max, self.bounds)
-                p.evaluate()
+    def iterate(self):
+        improved = False
+        for p in self.swarm:
+            p.move(self.gbest_position, self.w, self.c1, self.c2, self.v_max, self.bounds)
+            p.evaluate()
 
-                if p.best_value < self.gbest_value:
-                    self.gbest_value = p.best_value
-                    self.gbest_position = p.best_position
+            if p.best_value < self.gbest_value:
+                self.gbest_value = p.best_value
+                self.gbest_position = p.best_position.copy()
+                improved = True
+        return improved
 
-        return self.gbest_position, self.gbest_value
+    def run(self, patience=10, plot=False, pause=0.01):
+        no_improvement = 0
+
+        history = []
+
+        if plot:
+            plt.ion()
+            fig, ax = plt.subplots()
+            line, = ax.plot([], [])
+            ax.set_xlabel("iteration")
+            ax.set_ylabel("best value")
+            fig.show()
+
+        for it in range(self.n_iterations):
+            improved = self.iterate()
+
+            # zapis prawdziwej wartości (odwiniętej z mm)
+            best_real_value = self.mm * self.gbest_value
+            history.append(best_real_value)
+
+            if plot:
+                line.set_data(range(len(history)), history)
+                ax.relim()
+                ax.autoscale_view()
+                plt.pause(pause)
+
+            if improved:
+                no_improvement = 0
+            else:
+                no_improvement += 1
+
+            if no_improvement >= patience:
+                break
+
+        if plot:
+            plt.ioff()
+            plt.show()
+
+        return self.gbest_position, self.mm * self.gbest_value, history
