@@ -3,18 +3,17 @@ from particle_swarm_optimization import ParticleSwarmOptimization
 from functions import *
 
 parametry = {
-    'objective_function': booth_function,
-    'bounds': [(-10, 10), (-10, 10)], # this indicates in what dimension it will work
+    'objective_function': himmelblaus_function,
+    'bounds': [(-1, 1), (-1, 1)], # this indicates in what dimension it will work
     'num_particles': 50,
     'num_iterations': 100,
     'w': 0.75, # inertia constant
     'c1': 1.0, # cognative constant
     'c2': 2.0, # social constant,
     'v_max': 1.0,
-    'minimization': True
+    'minimization': False
 }
 
-bounds = [(-10, 10), (-10, 10)]
 pso = ParticleSwarmOptimization(
     parametry['objective_function'],
     parametry['bounds'],

@@ -17,7 +17,6 @@ class Particle:
     def __init__(self, position, fitness, mm):
         self.position = position.copy() # kopia przekazanej listy pozycji
         dim = len(position)
-        #TODO: zastanowic sie nad wybraniem losowych poczatkowych predkosci np z zakresu [-1,1]
         self.velocity = [0.0] * dim
 
         self.fitness = lambda X: mm * fitness(X)
