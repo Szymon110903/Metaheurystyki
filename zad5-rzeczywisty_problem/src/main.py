@@ -3,6 +3,7 @@ from vrptw.parser import load_solomon
 from vrptw.distance import build_distance_matrix
 from vrptw.models import *
 from vrptw.evaluation import evaluate_solution
+from vrptw.construction import can_append_feasible, build_initial_solution_ready_time
 
 if __name__ == "__main__":
     base = Path(__file__).resolve().parents[1]
@@ -11,16 +12,12 @@ if __name__ == "__main__":
     name, max_vehicles, capacity, depot, customers = load_solomon(data_dir / "r101.txt")
     # print(name, max_vehicles, capacity, depot, customers)
 
-    #stworzenie Instance
     nodes = [depot] + customers
     dist = build_distance_matrix(nodes)
 
-    routes = []
-    cid = 1
-    while cid <= 100:
-        routes.append(Route([cid, cid + 1, cid + 2, cid + 3]))
-        cid += 4
-
-    sol = Solution(routes=routes)
+    sol = build_initial_solution_ready_time(nodes, dist, capacity, max_vehicles)
     score = evaluate_solution(nodes, dist, capacity, max_vehicles, sol)
-    print("Score test:", score)
+
+    print("Initial solution (ready_time heuristic):", score)
+    print("Routes:", len(sol.routes))
+    print("First route length:", len(sol.routes[0].stops))
