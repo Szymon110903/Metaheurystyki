@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List, Optional, Tuple, Dict
 from .models import Customer
 
+
 def load_solomon(path: str | Path) -> Tuple[str, int, int, Customer, List[Customer]]:
     path = Path(path)
     lines = path.read_text(encoding="utf-8", errors="ignore").splitlines()

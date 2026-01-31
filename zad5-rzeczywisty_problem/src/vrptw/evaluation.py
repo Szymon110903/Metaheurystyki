@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from .models import Customer, Solution
 from .validation import validate_solution
 
+
 @dataclass(frozen=True)
 class RouteStats:
     distance: float
@@ -19,7 +20,9 @@ class Score:
     def key(self) -> tuple[int, float, float]:
         return (self.vehicles, self.penalty, self.distance)
 
-
+'''
+Symulacja przejazdu jednej trasy, zwraca statystyki trasy
+'''
 def simulate_route(
     nodes: list[Customer],
     dist: list[list[float]],
@@ -70,6 +73,9 @@ def simulate_route(
         end_time=t,
     )
 
+'''
+Suma statystyk dla całego rozwiązania
+'''
 def evaluate_solution(
     nodes: list[Customer],
     dist: list[list[float]],

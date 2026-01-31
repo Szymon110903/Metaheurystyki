@@ -3,6 +3,8 @@ from particle_swarm_optimization import ParticleSwarmOptimization
 from functions import *
 import numpy as np
 
+# # booth_function
+# # himmelblaus_function
 parametry = {
     'objective_function': booth_function,
     'bounds': [(-10, 10), (-10, 10)], 
