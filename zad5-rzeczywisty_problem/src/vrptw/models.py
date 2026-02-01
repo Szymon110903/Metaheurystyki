@@ -8,12 +8,9 @@ class Customer:
     '''
 
     id: int
-    # TODO: x,y moze nie jako odzielne floaty, tylko (x,y)
     x: float
     y: float
-    # TODO: (invariant) demand >= 0
     demand: int
-    # TODO: (invariant) ready_time <= due_date
     ready_time: float
     due_date: float
     service_time: float
@@ -40,7 +37,6 @@ class Instance:
         return self.distance_matrix[point_a.id][point_b.id]
 
 
-# TODO: czy rzeczywiście jest do tego potrzebna klasa?
 @dataclass
 class Route:
     stops: List[int] # lista ID klientów (bez Depot)

@@ -16,7 +16,7 @@ def can_append_feasible(
     - late_time == 0 (wliczając okno depo na powrocie)
     """
     new_stops = route.stops + [customer_id]
-    stats = simulate_route(nodes, dist, capacity, new_stops)
+    stats = simulate_route(nodes, dist, new_stops)
 
     if stats.load > capacity:
         return False

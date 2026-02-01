@@ -30,7 +30,7 @@ class GeneticAlgorithm:
         
         for i in range(len(route.stops) + 1):
             test_stops = route.stops[:i] + [customer_id] + route.stops[i:]
-            stats = simulate_route(self.nodes, self.dist_matrix, self.capacity, test_stops)
+            stats = simulate_route(self.nodes, self.dist_matrix, test_stops)
             current_score = (stats.late_time, stats.load > self.capacity, stats.distance)
             
             if current_score < best_score:

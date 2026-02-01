@@ -26,7 +26,6 @@ Symulacja przejazdu jednej trasy, zwraca statystyki trasy
 def simulate_route(
     nodes: list[Customer],
     dist: list[list[float]],
-    capacity: int,
     route_stops: list[int],
 ) -> RouteStats:
     t = 0.0
@@ -91,7 +90,7 @@ def evaluate_solution(
     total_overflow = 0.0
 
     for route in solution.routes:
-        rs = simulate_route(nodes, dist, capacity, route.stops)
+        rs = simulate_route(nodes, dist, route.stops)
         total_dist += rs.distance
         total_late += rs.late_time
         if rs.load > capacity:
