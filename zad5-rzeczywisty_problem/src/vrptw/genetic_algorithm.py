@@ -5,13 +5,14 @@ from .models import Solution, Route
 from .evaluation import evaluate_solution, simulate_route
 
 class GeneticAlgorithm:
-    def __init__(self, nodes, dist_matrix, capacity, max_vehicles, pop_size=100):
+    def __init__(self, nodes, dist_matrix, capacity, max_vehicles, pop_size=100, mutation_rate=0.1):
         self.nodes = nodes
         self.dist_matrix = dist_matrix
         self.capacity = capacity
         self.max_vehicles = max_vehicles
         self.pop_size = pop_size
         self.population: List[Solution] = []
+        self.mutation_rate = mutation_rate 
         # Rozbudowana historia do analizy w sprawozdaniu
         self.history: List[Dict[str, Any]] = []
 
@@ -114,7 +115,12 @@ class GeneticAlgorithm:
             
             while len(next_gen) < self.pop_size:
                 parent = random.choice(next_gen[:10])
+                child = copy.deepcopy(parent)
+
+                if random.random() < self.mutation_rate:
+                    child = self.mutate(child)
                 child = self.mutate(copy.deepcopy(parent))
+                
                 child.routes = [r for r in child.routes if r.stops]
                 next_gen.append(child)
 

@@ -17,7 +17,7 @@ config = {
     'ga_params': {
         'pop_size': 100,
         'generations': 1000,
-        # 'mutation_rate': 0.1,
+        'mutation_rate': 0.1,
     }
 }
 
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     # pętla eksperymentów
     all_scores = []
     best_overall_sol = None
-    best_overall_score = float('inf')
+    best_overall_score_obj = None  # Przechowujemy cały obiekt Score dla porównań .key()
     all_histories = []
 
     for i in range(config['num_runs']):
@@ -81,9 +81,10 @@ if __name__ == "__main__":
 
         print(f"    Wynik: Dystans = {score_opt.distance:.2f}, Kara = {score_opt.penalty:.2f}")
 
-        # Zapamiętaj najlepsze rozwiązanie ze wszystkich prób
-        if score_opt.distance < best_overall_score and score_opt.penalty == 0:
-            best_overall_score = score_opt.distance
+        # Zmiana: Używamy metody .key() do hierarchicznego porównania (Penalty > Vehicles > Distance)
+        # Dzięki temu zawsze wybierzesz "najlepsze z możliwych"
+        if best_overall_sol is None or score_opt.key() < best_overall_score_obj.key():
+            best_overall_score_obj = score_opt
             best_overall_sol = sol_opt
 
     # Analiza statystyczna (na podstawie dystansu)
