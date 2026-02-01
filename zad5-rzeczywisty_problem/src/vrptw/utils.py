@@ -26,47 +26,47 @@ def plot_solution(nodes, solution, title="Trasy VRPTW"):
     plt.legend(loc='upper right')
     plt.show()
 
-def plot_training_history(history, plots_dir: Path, instance_name: str):
-    """generuje i zapisuje wykresy kary oraz dystansu na podstawie historii GA."""
+def plot_training_history(history, plots_dir: Path, instance_name: str, test_param: str = ""):
+    """
+    Generuje wykresy z informacją o testowanym parametrze.
+    test_param: np. "Pop_50", "Elite_0.2" itp.
+    """
     if not history:
-        print("BŁĄD: Historia jest pusta, nie można wygenerować wykresów.")
+        print("BŁĄD: Historia jest pusta.")
         return
 
     plots_dir.mkdir(exist_ok=True)
+    suffix = f"_{test_param}" if test_param else ""
 
     gens = [h['gen'] for h in history]
     best_penalties = [h['best_penalty'] for h in history]
     avg_penalties = [h['avg_penalty'] for h in history]
     distances = [h['best_dist'] for h in history]
 
-    # wykres 1: kara (wykonalność)
+    # Wykres 1: Kara
     plt.figure(figsize=(10, 5))
     plt.plot(gens, best_penalties, label='Najlepsza Kara', color='red')
     plt.plot(gens, avg_penalties, label='Średnia Kara', alpha=0.3, color='orange')
-    plt.title(f"Analiza poprawy wykonalności - {instance_name}")
+    plt.title(f"Analiza wykonalności - {instance_name} ({test_param})")
     plt.xlabel("Generacja")
     plt.ylabel("Wartość kary")
     plt.legend()
     plt.grid(True)
 
-    path_penalty = plots_dir / f"{instance_name}_analiza_penalty.png"
+    path_penalty = plots_dir / f"{instance_name}{suffix}_penalty.png"
     plt.savefig(path_penalty)
-    print(f"Zapisano: {path_penalty}")
     plt.show()
     plt.close()
 
-    # wykres 2: dystans
+    # Wykres 2: Dystans
     plt.figure(figsize=(10, 5))
     plt.plot(gens, distances, color='green', linewidth=2)
-    plt.title(f"Zmiana całkowitego dystansu - {instance_name}")
+    plt.title(f"Zmiana całkowitego dystansu - {instance_name} ({test_param})")
     plt.xlabel("Generacja")
     plt.ylabel("Dystans")
     plt.grid(True)
 
-    path_distance = plots_dir / f"{instance_name}_anazlia_distance.png"
+    path_distance = plots_dir / f"{instance_name}{suffix}_distance.png"
     plt.savefig(path_distance)
-    print(f"Zapisano: {path_distance}")
     plt.show()
     plt.close()
-
-    print(f"Wykresy zostały zapisane w folderze: {plots_dir}")

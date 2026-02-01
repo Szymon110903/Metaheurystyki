@@ -13,16 +13,16 @@ from vrptw.genetic_algorithm import GeneticAlgorithm
 # KONFIGURACJA EKSPERYMENTU
 # ==========================================
 config = {
-    'instance_file': "r101.txt",  # nazwa pliku z folderu data/solomon_100/
+    'instance_file': "rc101.txt",  # nazwa pliku z folderu data/solomon_100/
     'num_runs': 5,                # Ile razy powtórzyć test (dla statystyki)
     'ga_params': {
         'pop_size': 100,
         'generations': 1000,      
-        'mutation_rate': 0.1,     
-        'elitism_rate': 0.2       
+        'mutation_rate': 0.4,     
+        'elitism_rate': 0.4  
     }
 }
-
+current_test = f"elitism_rate{config['ga_params']['elitism_rate']}"
 def run_single_test(nodes, dist_matrix, capacity, max_vehicles, sol_init, config_ga):
     '''Przeprowadza jeden pełny bieg algorytmu GA z nowymi parametrami.'''
     ga = GeneticAlgorithm(
@@ -110,4 +110,4 @@ if __name__ == "__main__":
         plot_solution(nodes, best_overall_sol, title=f"Najlepsza Trasa GA ({instance_name})")
 
     # Wykresy zbieżności
-    plot_training_history(all_histories[-1], plots_dir, instance_name)
+    plot_training_history(all_histories[-1], plots_dir, instance_name, test_param=current_test)
