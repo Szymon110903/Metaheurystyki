@@ -5,7 +5,7 @@ from .models import Solution, Route
 from .evaluation import evaluate_solution, simulate_route
 
 class GeneticAlgorithm:
-    def __init__(self, nodes, dist_matrix, capacity, max_vehicles, pop_size=100, mutation_rate=0.1):
+    def __init__(self, nodes, dist_matrix, capacity, max_vehicles, pop_size=100, mutation_rate=0.1, elitism_rate=0.2):
         self.nodes = nodes
         self.dist_matrix = dist_matrix
         self.capacity = capacity
@@ -13,6 +13,7 @@ class GeneticAlgorithm:
         self.pop_size = pop_size
         self.population: List[Solution] = []
         self.mutation_rate = mutation_rate 
+        self.elitism_rate = elitism_rate 
         # Rozbudowana historia do analizy w sprawozdaniu
         self.history: List[Dict[str, Any]] = []
 
@@ -112,15 +113,16 @@ class GeneticAlgorithm:
                 print(f"{gen:<5} | {best_sc.vehicles:<4} | {best_sc.penalty:<10.2f} | {best_sc.distance:<10.2f} | {avg_pen:<10.2f}")
 
             next_gen = [x[2] for x in evaluated_pop[:int(self.pop_size * 0.2)]]
-            
+            n_elite = int(self.pop_size * self.elitism_rate)
+            next_gen = [x[2] for x in evaluated_pop[:n_elite]]
+
             while len(next_gen) < self.pop_size:
-                parent = random.choice(next_gen[:10])
+                parent = random.choice(evaluated_pop[:max(1, n_elite)])[2]
                 child = copy.deepcopy(parent)
 
                 if random.random() < self.mutation_rate:
                     child = self.mutate(child)
-                child = self.mutate(copy.deepcopy(parent))
-                
+
                 child.routes = [r for r in child.routes if r.stops]
                 next_gen.append(child)
 
