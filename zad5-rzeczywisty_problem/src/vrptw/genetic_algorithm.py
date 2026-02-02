@@ -14,14 +14,12 @@ class GeneticAlgorithm:
         self.population: List[Solution] = []
         self.mutation_rate = mutation_rate 
         self.elitism_rate = elitism_rate 
-        # Rozbudowana historia do analizy w sprawozdaniu
         self.history: List[Dict[str, Any]] = []
 
     def create_initial_population(self, base_solution: Solution):
         """Inicjalizacja populacji rozwiązaniem startowym i jego wariacjami."""
         self.population = [base_solution]
         for _ in range(self.pop_size - 1):
-            # Tworzymy kopie z silną mutacją na start, aby przeszukać przestrzeń
             mutated = self.mutate(copy.deepcopy(base_solution))
             self.population.append(mutated)
 
